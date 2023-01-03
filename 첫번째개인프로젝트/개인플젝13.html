@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>개인플젝</title>
+<style>
+#body{
+    background-size: 100%;
+}
+#wrapper{
+    width: 900px;
+    height: 600px;
+    margin: auto;
+    background: skyblue;
+    position: relative;
+    border-radius: 15px;
+    border: 1px gray solid;
+    text-align: center;
+}
+#bookDot{
+    width: 885px;
+    height: 585px;
+    position: absolute;
+    border: 2px dashed white;
+    border-radius: 10px;
+    margin: 5px;
+}
+#page{
+    width: 870px;
+    height: 570px;
+    position: absolute;
+    background: gainsboro;
+    margin: 8px;
+    flex: 100%;
+    border-radius: 10px;
+}
+#col1{
+    width: 200px;
+    height: 500px;
+    position: absolute;
+    background: white;
+    border-radius: 10px;
+    left: 20px;
+    top: 50px;
+    float: left;
+}
+#col2{
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    background: white;
+    border-radius: 10px;
+    left: 230px;
+    top: 50px;
+    overflow: scroll;
+    float: left;
+}
+#tap{
+    width: 400px;
+    height: 80px;
+    position: relative;
+    border-top: 1px dashed gray;
+    border-bottom: 1px dashed gray;
+    /* background: beige; */
+    left: 50px;
+    top: 10px;
+}
+#pado{
+    position: absolute;
+    left: 60px;
+    top: 450px;
+}
+#today{
+    position: absolute;
+    left: 9px;
+    top: 20px;
+}
+#today span{
+    /*font-size: 12px; font-style: oblique; padding-left: 50px;*/
+    font-size: 12px;
+    font-size: oblique;
+    text-align: left;
+}
+#visitor-area{
+    position: absolute;
+    width: 400px;
+    height: 120px;
+    background: rgb(236, 235, 235);
+    top: 350px;
+    left: 50px;
+}
+#title{
+    position: absolute;
+    left: 235px;
+    top: 21px;
+}
+.line{
+    border-top: 1px solid black;
+    width: 150px;
+    margin-left: 26px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+.tap-name{
+    position: absolute;
+    float: left;
+    width: 50px;
+    background: red;
+    left: 10px;
+    top: 10px;
+    border-radius: 5px;
+}
+.tap-text{
+    position: absolute;
+    float: left;
+    width: 270px;
+    border: 1px solid black;
+    left: 70px;
+    top: 10px;
+
+}
+/* .saw{color: yellow;} */
+.font-color{text-align: left; color: skyblue;}
+</style>
+
+<script src="./Menu.js"></script>
+
+
+<script src="./Visitor.js"></script>
+<script src="./Kitty.js"></script>
+<script>
+let bg;
+let n=0;
+// let mini;
+let kitty;
+let brick;
+let room;
+let bgX=2;
+let wrapper;            //얘가 왜 지역변수일까?-> 배경색 바꾸려고!
+let targetX=0;          //마우스값
+let targetY=0;
+let padoCategory;           //얘는 2차원 배열
+let brickArray=[];
+let visitorArray=[];            //각각의 값을 받은 이차원배열
+let wrapperColor=["skyblue", "black", "pink", "red"];
+let menuName=["Home", "Profile", "Photo", "Diary", "Visitor"];
+let bgArray=["hompi4.webp", "hompi1.jpg","hompi2.jpg","hompi3.jpg"];
+let roomArray=["miniroom0.jpg", "miniroom1.jpg", "miniroom2.jpg", "miniroom3.gif"];
+
+//방명록에 남겨지는 댓글들
+let comments=[
+    "No.03  쪼꼬송이♥        2008. 8. 18",
+    "No.02  ★깨로로☆           2008. 7. 24",
+    "No.01  가을소녀™           2008. 5. 2",
+]
+let chats=[
+    "\n내일 급식 뭐야~~~~???? \n\n 방명록 남기고 간당!**^^^^",
+    "\n안뇽 >_< \n\n 미니홈피 잘 들렀다 가요~~!!☆★",
+    "\n나랑 일촌 맺자~~~!!"
+];
+let colorArr=["yellow", "skyblue"];
+let miniArr=["minimi.gif", "minimi3.gif"];
+
+function createBrick(){
+    for(let i=0; i<menuName.length; i++){
+        brick=new Menu(page, "skyblue", 720, 80+40*i, 65, 35, menuName[i]);
+
+        brickArray.push(brick);         //메뉴바들을 배열에 담아 따로 처리하자
+        brickArray[0].div.background="white";
+    }
+}
+
+function rollOver(obj){
+
+    for(let i=0; i<brickArray.length;i++){
+        if(brickArray[i]==obj){
+            brickArray[i].div.style.background="white";         //brickArray가 div자체는 아니기 때문에 i번째의 div라고 꼭!!! 명시하자
+        }else{
+            brickArray[i].div.style.background="skyblue";
+        }
+    }
+
+    if(obj==brickArray[2]){
+        pageChange();
+    }else if(obj==brickArray[0]){
+        home();
+    }else if(obj==brickArray[1]){           //Profile 부분
+        remove();
+        profile();
+
+    }else if(obj==brickArray[3]){           //Diary부분
+        let n=prompt("비밀번호를 대시오");
+        let result="1234";
+        if(n==result){
+            alert("들어가세요");
+            remove();
+            diary();
+        }else{
+            alert("입장불가!"); return;
+        }
+
+    }else if(obj==brickArray[4]){           //Visitor
+        remove();
+        createVisitor();
+    }
+}
+
+function diary(){
+    let col2=document.getElementById("col2");
+    let img=document.createElement("img");
+    let iframe=document.createElement("iframe");
+    
+    img.style.width=150+"px";
+    img.style.height=150+"px";
+    img.style.top=100+"px";
+    img.src="../images/minimi6.gif";
+    
+    iframe.style.width=500+"px";
+    iframe.style.height=300+"px";
+    iframe.src="https://www.youtube.com/embed/4LIt_ICJyjk";
+    iframe.title="YouTube video player";
+    iframe.style.framborder="0";
+    iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    iframe.allowfullscreen;
+    
+    col2.appendChild(img);
+    col2.appendChild(iframe);
+}
+
+function createVisitor(){
+    let col2=document.getElementById("col2");
+    //반복문으로 정리?
+
+    let visitor=new Visitor(col2, "rgb(248, 248, 46)", 35,0, 400,200, "../images/minimi.gif", comments[0], chats[0]);
+    let visitor2=new Visitor(col2, "rgb(209, 209, 209)", 35,visitor.height+20, 400,200, "../images/minimi3.gif", comments[1], chats[1]);
+    let visitor3=new Visitor(col2, "salmon", 35,(visitor.height*2)+40, 400,200, "../images/minimi2.gif", comments[2],chats[2]);
+}
+
+//페이지 전환을 위해 내용을 비우기
+function remove(){
+    let tap=document.getElementById("tap");
+    let visitorArea=document.getElementById("visitor-area");
+    let miniRoom=document.getElementById("miniRoom");
+
+    kitty.img.style.display="none";
+    tap.style.display="none";
+    visitorArea.style.display="none";
+    room.style.display="none";
+}
+
+function profile(){
+    let div=document.createElement("div");
+    let col2=document.getElementById("col2");
+    let proImg=document.createElement("img");
+    let proImg2=document.createElement("img");
+
+    div.style.position="absolute";
+    div.style.width=300+"px";
+    div.style.height=300+"px";
+    div.style.left=70+"px";
+    div.style.top=100+"px";
+    div.style.borderTop="1px solid black";
+    div.style.borderBottom="1px solid black";
+
+    proImg.style.width=100+"px";
+    proImg.style.position="absolute";
+    proImg.style.left=300+"px";
+    proImg.src="../images/diary.jpg";
+
+    proImg2.style.position="absolute";
+    proImg2.src="../images/diary2.gif";
+
+    let tag="<span><h3>프로필</h3></span>";
+    tag+="<p></p>";
+    tag+="<span>이름 : 류예서 <br><p></p> 나이 : 12살 <br><p></p> 한내초 5학년 2반</span>";
+    div.innerHTML=tag;
+    div.appendChild(proImg2);
+    col2.appendChild(div);
+    col2.appendChild(proImg);
+}
+
+//클래스로 생성한 객체들을 따로따로 관리한다
+//이들의 click을 각자 받을 것
+
+function home(){
+    location.href="개인플젝13.html";
+}
+
+function pageChange(){
+    location.href="cyPhoto5.html";
+}
+
+function createRoom(){
+    let col2=document.getElementById("col2");
+    room=document.createElement("img");
+    room.src="../images/miniroom0.jpg";
+    document.body.style.background="url(../images/hompi4.webp)";
+
+    room.style.position="absolute";
+    room.style.width=400+"px";
+    room.style.height=230+"px";
+    room.style.left=50+"px";
+    room.style.top=100+"px";
+    
+    col2.appendChild(room);
+}
+
+function changeRoom(){
+        document.body.style.backgroundSize=100+"%";
+        n++;
+        room.src="../images/"+roomArray[n];
+        document.body.style.background="url(../images/"+bgArray[n]+")";
+        wrapper.style.background=wrapperColor[n];
+        if(n==4){
+            n=0;
+        }
+        if(n==0){
+            room.src="../images/"+roomArray[0];
+            document.body.style.background="url(../images/"+bgArray[0]+")";
+            wrapper.style.background=wrapperColor[0];
+        }
+}
+
+function createKitty(){
+    //container, src, x,y, width,height
+    kitty=new Kitty(col2, "../images/minimi4.gif", 159, 167, 160, 160);
+    kitty.creat();
+}
+function moveKitty(){
+    kitty.x=targetX;
+    kitty.y=targetY;
+    kitty.render();
+}
+
+
+function regist(){
+    let visitor_input=document.getElementsByName("visitor_input");          //배열
+    if(visitor_input[0].value==''){
+        alert("내용을 입력하세요");
+    }else{
+        let visitor=[]
+        visitor.push(visitor_input[0].value);
+        visitor.push(visitor_input[1].value);
+        visitor.push(visitor_input[2].value);
+
+        visitorArray.push(visitor);
+        printChat();
+
+        for(let i=0;i<visitor_input.length;i++){
+            visitor_input[i].value="";
+        }
+    }
+}
+
+function printChat(){
+    let chatArea=document.getElementById("chat-area");
+
+    let tag="<table width='100%'>"
+    tag+="<tr>";
+    tag+="<th class='font-color'>What Friends say</th>";
+    tag+="<th></th>";
+    tag+="<th></th>";
+    tag+="</tr>";
+
+    tag+="<tr>";
+    for(let a=0; a<visitorArray.length; a++){
+        let chat=visitorArray[a];
+        tag+="<tr align='left' onMouseOver=\"this.style.background='pink'\" onMouseOut=\"this.style.background=''\">";
+
+        for(let i=0; i<chat.length; i++){
+
+            if(i==2){
+                tag+="<td class='font-color'>"+chat[i]+"</td>"
+            }else{
+                tag+="<td>"+chat[i]+"</td>";
+            }
+        }
+        tag+="</tr>";
+    }
+    tag+="</table>";
+    chatArea.innerHTML=tag;
+}
+
+function music(){
+    let melon="https://www.melon.com/song/detail.htm?songId=1114595";
+    window.open(melon);
+}
+
+function init(){
+    createRoom();
+    createBrick();
+    createKitty();
+    
+    wrapper=document.getElementById("wrapper");
+    padoCategory=document.getElementsByName("padoCategory");
+    bt_chat=document.getElementById("bt_chat");
+    brickArray[0].div.style.background="white";         //처음 화면에서 home 버튼만 white
+
+    padoCategory[0].addEventListener("change", function(){
+        changeRoom(this.value);
+    });
+
+    bt_chat.addEventListener("click", function(){
+        regist();
+    });
+
+    room.addEventListener("mousedown", function(e){         //활동범위를 col2 -> room(<img>)로 변경
+        console.log(e.layerX, e.layerY);
+        targetX=e.layerX;
+        targetY=e.layerY;
+        moveKitty();
+    });
+}
+window.addEventListener("load",function(){
+    init();
+});
+</script>
+</head>
+<body>
+<div id="wrapper">
+    <div id="bookDot">
+        <div id="page">
+            <div id="today">
+                <span style="padding-left: 50px;"> TODAY <span style="color: red;">24</span><span  style="padding-left: 10px;">TOTAL 180</span></span>
+            </div>
+            <div id="title"><a href="개인플젝13.html" style="color: rgb(252, 79, 108);">♬ ㄷH충 살ㅈr ㄴH 미ⓝ i 홈피처럼..☆</a></div>
+            <div id="col1">
+                <!--여기 수정 중! -->
+                <img src="../images/black.jfif" position="absolute" style="width: 150px; top: 20px; padding-top: 15px;">
+                <div class="line"></div>
+
+                <div>           <!--상태명-->
+                    <h5 style="color: rgb(101, 187, 221);">사이 좋은 사람들</h5>
+                    <h5>행복한 싸이월드</h5>
+                    <h5>^_^</h5>
+                    <br>
+                    <h6 onclick="music()">♬ - 몽환의 숲<h6>
+                </div>
+
+                <select name="padoCategory" id="pado">
+                    <option>파도타기</option>
+                    <option value="">이웃1</option>
+                    <option value="">이웃2</option>
+                    <option value="">이웃3</option>
+                </select>
+            </div>  <!--여기까지가 col1-->
+
+            <div id="col2">
+                <!-- <div id="use">       페이지 전환을 위한 col2의 전체 div -->
+
+                    <div id="tap">
+                        <div class="tap-name">게시판</div><div class="tap-text"><a href="서브게임.html" style="color: red;">추억의 게임</a></div>
+                        <div class="tap-name" style="top:40px; background:skyblue">사진첩</div><div class="tap-text" style="top:40px"><a href="cyGallery.html" style="color: blue;">새로운 사진</a></div>
+                    </div>
+
+                    <!-- <div id="miniRoom"></div> -->
+                    <div id="visitor-area">
+                        <div style="width:100%; height:30px; border-top: 1px solid gray; border-bottom: 1px solid gray;">
+                            <input type="text" placeholder="What visitor say.." size="12" name="visitor_input">
+                            <input type="text" placeholder="일촌별명" size="5" name="visitor_input">
+                            <input type="text" placeholder="이름" size="5" name="visitor_input">
+                            <button style="width: 40px;" id="bt_chat">Enter</button>
+                        </div>
+                        <div id="chat-area" style="width:100%; height:70px;"></div>
+                    </div>
+
+                <!-- </div>      삭제를 위한 div감싸기 -->
+            </div>      <!--col2-->
+
+        </div><!--전체를 이루는 레이아웃-->
+    </div>
+</div>
+</body>
+</html>

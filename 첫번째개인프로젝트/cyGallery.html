@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>개인플젝</title>
+<style>
+#body{
+    background-size: 100%;
+}
+#wrapper{
+    width: 900px;
+    height: 600px;
+    margin: auto;
+    background: skyblue;
+    position: relative;
+    border-radius: 15px;
+    border: 1px gray solid;
+    text-align: center;
+}
+#bookDot{
+    width: 885px;
+    height: 585px;
+    position: absolute;
+    border: 2px dashed white;
+    border-radius: 10px;
+    margin: 5px;
+}
+#page{
+    width: 870px;
+    height: 570px;
+    position: absolute;
+    background: gainsboro;
+    margin: 8px;
+    flex: 100%;
+    border-radius: 10px;
+}
+#col1{
+    width: 200px;
+    height: 500px;
+    position: absolute;
+    background: white;
+    border-radius: 10px;
+    left: 20px;
+    top: 50px;
+    float: left;
+}
+#col2{
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    background: white;
+    border-radius: 10px;
+    left: 230px;
+    top: 50px;
+    overflow: scroll;
+    float: left;
+}
+#pado{
+    position: absolute;
+    left: 60px;
+    top: 450px;
+}
+#today{
+    position: absolute;
+    left: 9px;
+    top: 20px;
+}
+#today span{
+    /*font-size: 12px; font-style: oblique; padding-left: 50px;*/
+    font-size: 12px;
+    font-size: oblique;
+    text-align: left;
+}
+#title{
+    position: absolute;
+    left: 235px;
+    top: 21px;
+}
+.line{
+    border-top: 1px solid black;
+    width: 150px;
+    margin-left: 26px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+#select-area{
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    /* background: skyblue; */
+    top: 310px;
+    left: 30px;
+    border-top: 1px solid black;
+}
+#list-area{
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    /* background: beige; */
+    /* text-align: center; */
+    top: 30px;
+    left: 50px;
+}
+.font{font-size: 14px; font-style: italic;}
+.saw{color: purple;}
+.cyphoto{padding-top: 20px;}
+</style>
+<script src="../lib/util.js"></script>
+<script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
+<script>
+let bg;
+let img;
+let n=0;
+let arr=[];         //출력될 사진 정보 담는 배열
+let comment;
+let padoCategory;           //얘는 2차원 배열
+let contentArr=[];
+let currentIndex=0;
+let commentsArray=[];
+let menuName=["Home", "Profile", "Photo", "Diary", "Visitor"];
+let bgArray=["hompi4.webp", "hompi1.jfif","hompi2.jpg","hompi3.jpg"];
+
+function createBrick(){
+    for(let i=0; i<5; i++){
+        let brick=document.createElement("div");
+        brick.style.position="absolute";
+        brick.style.background="skyblue";
+        brick.style.left=720+"px";
+        brick.style.top=80+(40*i)+"px";
+        brick.style.width=65+"px";
+        brick.style.height=35+"px";
+        brick.style.fontSize=14+"px";
+        brick.style.borderRadius=10+"px";
+        brick.innerText=menuName[i];
+
+        brick.addEventListener("click",function(){
+            brick.style.background="white";
+        });
+        page.appendChild(brick);
+    }
+}
+
+function getInfo(obj){
+    let result=obj.value.lastIndexOf("\\");
+    console.log(result);
+
+    let str=obj.value.substring(result+1, obj.value.length);
+    console.log(str);
+
+    arr=str.split(".");
+    console.log(arr);           //여기 배열 담김
+
+    info=document.getElementsByName("info");            //이건 출력용
+    info[0].value=arr[0];
+    info[1].value=arr[1];
+}
+
+function printPhoto(){
+
+    document.getElementById("list-area").style.display="none";
+
+    img=document.createElement("img");
+    img.style.width=330+"px";
+    img.style.height=370+"px";
+    img.style.paddingTop=20+"px";
+    img.src="../images/"+arr[0]+"."+arr[1];
+
+    let col2=document.getElementById("col2");
+    
+//스타일시트로 옮겨감(commentArea)
+
+    comment=document.createElement("input");            //입력된 댓글
+    comment.style.size=80+"px";
+
+    let getComment=document.getElementById("getComment");       //댓글을 입력할 곳
+    getComment.appendChild(comment);        //input
+        
+    let bt_regist=document.createElement("button");
+    bt_regist.innerText="입력";
+    let bt_del=document.createElement("button");
+    bt_del.innerText="삭제";
+
+
+    col2.appendChild(img);          //이미지출력
+
+    getComment.appendChild(bt_regist);
+    getComment.appendChild(bt_del);
+
+    bt_regist.addEventListener("click",function(){
+        getComm();
+        printComment();
+        comment.value="";
+    });
+
+    bt_del.addEventListener("click",function(){
+        del();
+    });
+}
+
+
+
+//댓글들을 테이블 형식으로 누적시키자!
+function printComment(){
+    let printComment=document.getElementById("printComment");       //댓글들이 입력될 곳
+    let tag="<table border=\"1px\" width=\"100%\">";
+    tag+="<tr align='left'>";
+    tag+="퍼가요~♡";
+    tag+="</tr>";
+
+    for(let a=0; a<commentsArray.length; a++){
+        tag+="<tr align='left'>"
+        let com=commentsArray[a];
+        
+        for(let i=0;i<com.length;i++){
+            tag+="<td>"+com[i]+"</td>";
+        }
+        tag+="</tr>";
+    }
+
+    tag+="</table>";
+    printComment.innerHTML=tag;
+}
+
+
+
+function init(){
+    let commentArea=document.getElementById("comment-area");    //사진 나올곳
+    document.body.style.background="url(../images/hompi4.webp)";
+
+    createBrick();
+
+    padoCategory=document.getElementsByName("padoCategory");
+    bt_chat=document.getElementById("bt_chat");
+}
+window.addEventListener("load",function(){
+    init();
+});
+</script>
+</head>
+<body>
+<div id="wrapper">
+    <div id="bookDot">
+        <div id="page">
+
+            <div id="today">
+                <span style="padding-left: 50px;"> TODAY <span style="color: red;">24</span><span  style="padding-left: 10px;">TOTAL 180</span></span>
+            </div>
+
+            <div id="title"><a href="개인플젝13.html" class="saw active">♬ ㄷH충 살ㅈr ㄴH 미ⓝ i 홈피처럼..☆</a></div>
+
+            <div id="col1">
+                <div>
+                    <span style="text-align: left;">Photo</span>
+                    <div class="line"></div>
+
+                    <span style="font-size: 12px;">기본폴더</span>
+                </div>
+                <div id="select-area">
+                    <div width="100%" border-bottom="1px solid black">
+                        <div onClick="alert('파일을 선택해주세요')" class="font">사진 추가</div>
+                        <div onClick="photoDel()" class="font">사진 삭제</div>
+                    </div>
+                    <p></p>
+
+                        <input type="file" onchange="getInfo(this)">
+                        <p></p>
+                        <input type="text" name="info" placeholder="파일명 나올 곳" size="15">
+                        <input type="text" name="info" placeholder="확장자 나올 곳" size="15">
+
+                </div>          <!--slelect-area-->
+            </div>          <!--col1-->
+
+            <div id="col2">
+                <button onClick="printPhoto()" style=" left: 390px; top: 10px; position: absolute;">사진등록</button>
+
+                <div id="list-area">
+
+                    <img src="../images/cyphoto.jfif" class="cyphoto">
+                    <img src="../images/cyphoto2.jfif" class="cyphoto">
+                    <p></p>
+                    <span>----------------------------------------------</span>
+                    <img src="../images/cyphoto3.jfif" class="cyphoto">
+                    <p></p>
+                    <span>-------------------------------------------</span>
+                    <img src="../images/cyphoto4.jfif" class="cyphoto">
+
+                </div>            <!--동적으로 바꿀 예정-->
+
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
